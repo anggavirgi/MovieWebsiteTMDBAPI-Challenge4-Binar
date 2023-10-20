@@ -1,7 +1,9 @@
 import React from "react";
-import { Button } from "../elements/Button";
 import { Input } from "../elements/Input";
 import { useNavigate } from "react-router-dom";
+import ava from "../../assets/img/ava.jpg";
+import { useDataMe } from "../../services/GetMe";
+import { CookieStorage, CookiesKeys } from "../../utils/cookies";
 
 export const Header = () => {
   const navigate = useNavigate();
@@ -9,15 +11,23 @@ export const Header = () => {
   const handleSearch = (keyword) => {
     navigate("/search", {
       state: {
-        search: keyword
-      }
-    })
+        search: keyword,
+      },
+    });
+  };
+
+  const { data: fetchMe, isSuccess } = useDataMe();
+  const dataMe = isSuccess ? fetchMe : {};
+
+  const handleLogout = () => {
+    CookieStorage.remove(CookiesKeys.AuthToken);
+    window.location.href = "/";
   };
 
   return (
     <div className="flex justify-between items-center px-14 py-7 gap-3 bg-main text-white">
       <div
-        onClick={() => navigate("/")}
+        onClick={() => navigate("/home")}
         className="px-5 py-1.5 font-bold border-b border-secondary shadow shadow-secondary cursor-pointer"
       >
         <span className="text-secondary">Angga's</span>
@@ -45,14 +55,16 @@ export const Header = () => {
         >
           About Me
         </div>
-        <Button
-          text="Sign In"
-          textColor="text-white"
-          textHover="hover:text-secondary"
-          bgColor="bg-secondary"
-          width="w-[85px]"
-          bgHover="hover:bg-main"
-        />
+        <div className="flex items-center gap-2 border border-secondary rounded-full pe-3">
+          <img src={ava} alt="" className="w-8 h-8 rounded-full object-cover" />
+          <div className="text-secondary">{dataMe.name}</div>
+        </div>
+        <button
+          onClick={handleLogout}
+          className="py-1.5 w-[85px] text-white hover:text-red-500 text-sm font-semibold bg-red-500 border border-red-500 rounded-lg hover:bg-main hover:shadow-md hover:shadow-red-500"
+        >
+          Logout
+        </button>
       </div>
     </div>
   );
